@@ -83,8 +83,19 @@ where date between '2022-01-01' and '2023-01-01' and  materialquantity > 1
 group by chemical_name,final_measure, unit_multi,unitmeasure
 
 
-
-
+--- Table build off of top table to see the break down of each customer like chem usage, sqft.
+  with a as  (select  *,reverse(siteaddress) as address
+    from grouped_by_customer)
+	,b as (
+   select *,substring(address,1,6) as address1
+   from a)
+   ,c as (select *,reverse(address1) as zip
+   from b)
+   select states,zip,chemical_name,sum(Quantity) as Quantity,count(accountnum) as num_of_uses, 
+   count(distinct(accountnum)) as num_of_customers,
+   sum(sum_sqft) as sum_sqft 
+   from c
+   group by zip, chemical_name,states
 
 
 
