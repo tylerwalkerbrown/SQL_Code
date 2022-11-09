@@ -25,7 +25,7 @@ when chemical = 'Summit BTI Granules' then 'Summit BTI Granules'
 when chemical =  'LIV Repeller' then 'LIV Repeller' 
 when chemical = 'Altosid' then 'Altosid'  end as chemical_name,
 case when siteaddress like '%NH%' then 1 else 0 end as states,
-(materialquantity * 5000) as squarefeet,siteaddress
+(materialquantity * 5000) as squarefeet,siteaddress,eventname
 from all_sprays)
 ,b as (select *,case when chemical_name= 'Duraflex' then 1
 when chemical_name ='EcoVia MT' or chemical_name ='EcoVia G' then 0.5
@@ -53,11 +53,22 @@ when chemical_name ='Pivot 10' then 'ml'
 when chemical_name ='Summit Bti Dunks'or chemical_name ='Thermacell Tick Tubes' or chemical_name = 'In2Care Unit' or chemical_name = 'In2Mix Bait Sachets' or chemical_name = 'Summit BTI Granules' then 'each'
 when chemical_name ='Surf-Ac 820' then 'ml' 
 when chemical_name = 'Tekko 0.2G Larvicide (High Rate)' or chemical_name = 'Altosid' 
-or chemical_name = 'Essentria IC3' or chemical_name = 'AquaBacXT' then 'oz' else 0 end as unitmeasure,current_date as today
+or chemical_name = 'Essentria IC3' or chemical_name = 'AquaBacXT' then 'oz' else 0 end as unitmeasure,current_date as today,
+case when chemical like 'Duraflex%' or chemical like 'Cyzmic%' or chemical like 'Stryker%'
+or chemical ='Bifen' or chemical= 'Pivot 10' or chemical like 'Surf-Ac%' or chemical ='AquaBacXT' or chemical = 'Essentria IC3' then 'Synthetic'
+when chemical like 'Stop the Bite%' or chemical = 'Aquabac (200G)' or chemical = 'AquaBacXT' 
+or chemical = 'Tekko Pro' or chemical = 'Tekko 0.2G Larvicide (Low Rate)' or chemical = 'Tekko 0.2G Larvicide (High Rate)' 
+or chemical = 'In2Care Unit' or chemical = 'Altosid' or chemical = 'In2Mix Bait Sachets' or chemical ='Altosid Pro-G' 
+or chemical =  'LIV Repeller' or chemical = 'Summit BTI Granules' or chemical = 'B.T.I. Briquets' or chemical = 'Summit Bti Dunks' 
+or chemical = 'EcoVia EC' or chemical = 'EcoVia G' or chemical = 'EvoVia G' or chemical = 'EcoVia MT' or chemical = 'Bifen Granulars' 
+or chemical = 'Thermacell Tick Tubes' or chemical = 'Summit Bti Dunks'
+then 'Natural' else Null end as spray_type
 from adjust)
+, c as (
 select *,case when unitmeasure = 'oz' then 128
 when unitmeasure = 'ml' then 29.5735
 when unitmeasure = 'pound' then 1
 when unitmeasure = 'tsp' then 96
-when unitmeasure = 'each' then 1 end as divide,datediff(today,date) as days_since_spray
+when unitmeasure = 'each' then 1 else 1 end as divide,datediff(today,date) as days_since_spray
 from b)
+select * from c)
