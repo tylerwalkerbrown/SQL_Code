@@ -1,0 +1,15 @@
+with a as(
+select chemical_name,squarefeet,case when chemical_name = 'Bifen' or chemical_name = 'Duraflex'  or 
+chemical_name = 'EcoVia MT' or chemical_name = 'Stop the Bite (STB) 6oz/gal' then (quantity * unit_multi)/ divide 
+when chemical_name = 'Summit Bti Dunks' or chemical_name = 'Thermacell Tick Tubes' then quantity * 1
+when chemical_name = 'Surf-Ac 820'  or chemical_name = 'Tekko 0.2G Larvicide (High Rate)' 
+ or chemical_name = 'Stryker'  or chemical_name = 'Altosid' then (quantity * unit_multi)/ divide 
+when chemical_name = 'EcoVia G' then (quantity * unit_multi)
+when chemical_name = 'In2Mix Bait Sachets' or chemical_name = 'In2Care Unit' then quantity*1
+when chemical_name = 'Bifen Granulars' then quantity
+when chemical_name = 'Aquabac (200G)' then quantity*.44*unit_multi
+when chemical_name = 'Pivot 10' then (unit_multi*quantity)/29.5735
+when chemical_name = 'Altosid Pro-G'then unit_multi*quantity *.44
+
+end as total from Project.all_records where date between '2022-01-01' and '2022-12-12' and states = 0)
+ select chemical_name , sum(total) as total_nh,sum(squarefeet)/43560 as acres from a group by chemical_name 
