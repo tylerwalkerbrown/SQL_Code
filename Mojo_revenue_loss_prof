@@ -1,0 +1,39 @@
+with a as (
+select accountnum as account_, Businessname, avg(measurement) as sqft
+from Project.sqft
+group by accountnum, Businessname)
+,b as (
+select sqft, count(sqft) as num_of_clients
+from a
+group by sqft)
+,c as (
+select * , ntile(6) over (order by sqft) as bins, (num_of_clients/412)*100 as percent, 
+(sqft*.006) as amount_to_charage
+from b
+order by num_of_clients desc
+)
+,bins as (
+select bins, avg(sqft) as avg_sqft,min(sqft) as min_sqft, max(sqft) as max_sqft, sum(num_of_clients) as num_of_clients
+from c 
+group by bins)
+, d as(
+select * , 
+case when bins = 1 then 98
+when bins = 2 then 98
+when bins = 3 then 110
+when bins = 4 then 130
+when bins = 5 then 170
+when bins = 6 then 210 end as 2023_prices,
+case when bins = 1 then 88
+when bins = 2 then 93
+when bins = 3 then 103
+when bins = 4 then 113
+when bins = 5 then 163
+when bins = 6 then 203 end as 2022_prices
+from bins)
+, final as(
+select *, (2023_prices*num_of_clients) as 2023_revenue ,(2022_prices*num_of_clients) as 2022_revenue
+from d)
+select * , (2023_revenue - 2022_revenue) as 2023_minus_2022_revenue, (2023_prices-2022_prices) as 2023_minus_2022_cost
+from final 
+order by bins asc
